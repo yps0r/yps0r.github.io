@@ -1,0 +1,193 @@
+/* iOS Cordova Tweak */
+.device-cordova.device-ios {
+  height: 100vh;
+}
+
+/* Left Panel right border when it is visible by breakpoint */
+.panel-left.panel-in-breakpoint:before {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background: rgba(0,0,0,0.1);
+  content: '';
+  z-index: 6000;
+}
+
+/* Hide navbar link which opens left panel when it is visible by breakpoint */
+.panel-left.panel-in-breakpoint ~ .view .navbar .panel-open[data-panel="left"] {
+  display: none;
+}
+
+/*
+  Extra borders for main view and left panel for iOS theme when it behaves as panel (before breakpoint size)
+*/
+.ios .panel-left:not(.panel-in-breakpoint).panel-in ~ .view-main:before,
+.ios .panel-left:not(.panel-in-breakpoint).panel-closing ~ .view-main:before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background: rgba(0,0,0,0.1);
+  content: '';
+  z-index: 6000;
+}
+
+.links-list a {
+    height:22px;
+}
+
+.larger {
+    --f7-block-font-size: 16px;
+}
+
+@font-face {
+    font-family: 'Araboto';
+    src: url('../fonts/Roboto-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ArabotoBold';
+    src: url('../fonts/Roboto-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+.font_araboto {
+    font-family: "Araboto", "RO Sans", sans-serif !important;
+}
+
+.font_araboto_bold {
+    font-family: "ArabotoBold", "RO Sans", sans-serif !important;
+    font-weight: 600 !important;
+    letter-spacing: 1px;
+    font-size: 16px;
+}
+
+.line_hr {
+    margin-left:10px !important;
+    margin-right:10px !important;
+    margin-top:30px !important;
+    margin-bottom:30px !important;
+    border-bottom-width: 1px;border-bottom-style: solid;
+    color: #889ef5;
+}
+
+.bigger {
+    font-size: 20px;
+}
+
+.x-bigger {
+    font-size: 30px;
+}
+
+.side_color {
+    background-color:#1540eb !important;
+}
+
+.grey {
+    color: rgb(56, 56, 54) !important;
+}
+
+.grey-light {
+    color: #c9cbcd;
+}
+
+.grey-green {
+    color: #383836 !important;
+}
+
+.green-bg {
+    background-color:#2de894 !important;
+}
+
+.border-add{
+    border-radius: 8px;
+    border: 2px solid #d5d5d9;
+    padding: 10px;
+}
+
+.link_blue {
+    color: #3395ff;
+}
+
+.link_white {
+    color: #ffffff !important;
+}
+
+.link_black {
+    color: #000000 !important;
+}
+
+.larger-height {
+    height: 200px !important;
+}
+
+.case_normal {
+    text-transform: none;
+}
+
+.title {
+    margin-left: 12px !important;
+}
+
+.smaller {
+    font-size: 14px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.transparent {
+    background-color: transparent !important;
+}
+
+.navbar-bg {
+    background: #FFFFFF !important;
+}
+
+.black-bg {
+    background: #000000 !important;
+}
+
+.grey-bg {
+    background: #f8f8fb !important;
+}
+
+.center {
+    text-align: center;
+    justify-content: center;
+}
+
+.toolbar {
+    margin-bottom:20px !important;
+    background: #FFFFFF !important;
+}
+
+.toolbar-bottom::after {
+    background: #FFFFFF !important;
+}
+
+.toolbar-inner {
+    background: #FFFFFF !important;
+}
+
+img.demo-lazy {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-width: 900px;
+    margin: auto;
+  }
+
+  div.demo-lazy {
+    background: #aaa;
+    background-size: cover;
+    height: 30vw;
+  }

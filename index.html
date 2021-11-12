@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <!--
+  Customize this policy to fit your own app's needs. For more guidance, see:
+      https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+  Some notes:
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+      * Enable inline JS: add 'unsafe-inline' to default-src
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: gap: content: blob:">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+
+  <meta name="apple-mobile-web-app-capable" content="yes" /> 
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" sizes="128x128" href="img/logo.png">
+
+  <meta name="theme-color" content="#fff">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <title>CoronaCheck</title>
+  
+  
+  <link rel="stylesheet" href="framework7/framework7-bundle.min.css">
+  <link rel="stylesheet" href="css/icons.css">
+  <link rel="stylesheet" href="css/app.css?t=13">
+</head>
+<body>
+  <div id="app" class="font_araboto larger" >
+    <!-- Left panel with cover effect -->
+    <div class="panel panel-left panel-cover theme-dark panel-init font_araboto_bold">
+      <div class="view view-init" data-name="left">
+        <div class="page side_color">
+          <div class="navbar side_color">
+            <div class="side_color"></div>
+            <a href="#"  class="link_white"  onclick="closepanel();">
+            <div class="navbar-inner sliding side_color">
+              <div class="title link_white font_araboto">x</div>
+            </div>
+            </a>
+          </div>
+          <div class="page-content link_white side_color">
+            <div class="block-title link_white side_color bigger font_araboto link_white"><a class="link_white" href="/">Scan QR-codes</a></div>
+            <div class="block-title link_white side_color bigger font_araboto link_white">Hoe het werkt</div>
+            <div class="list links-list side_color"><ul class="line_hr"></ul>
+            </div>
+            
+            <div class="block-title  link_white smaller font_araboto side_color"><a class="link_white" href="/">Support</a></div>
+            <div class="block-title  link_white smaller font_araboto side_color">Over deze app</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    
+    <!-- Your main view, should have "view-main" class -->
+    <div class="view view-main view-init safe-areas">
+      <div class="page grey" data-name="home">
+        <!-- Top Navbar -->
+        <div class="navbar">
+          <div class="navbar-bg"></div>
+          <div class="navbar-inner">
+            <div class="left grey">
+              <a href="#" class="link icon-only panel-open" data-panel="left">
+                <i class="icon f7-icons if-not-md grey">menu</i>
+                <i class="icon material-icons if-md grey">menu</i>
+              </a>
+            </div>
+            <div class="title sliding font_araboto_bold">CoronaCheck Simulator</div>
+            <div class="right">
+            </div>
+          </div>
+        </div>
+          <div class="toolbar toolbar-bottom">
+            <div class="toolbar-inner center">
+            <p>
+                <a href="javascript:scanQr();" class="button button-large button-fill side_color button-round" data-login-screen="#my-qr-screen">      VOEG PAPIEREN CODE TOE     </a>
+            </p>
+            </div>
+          </div>
+        <!-- Scrollable page content-->
+        <div class="page-content">
+            <div class="block">
+                <p>
+                    <div class="center">
+                        <img data-src="img/start.png" src="img/start.png" width="128" height="128" class="lazy lazy-fade-in demo-lazy" />
+                    </div>
+                </p>
+                <p class="bigger font_araboto_bold">Voor alle updates en info, check de <a class="link external" href="https://t.me/klokkenluiders">Klokkenluiders telegram groep</a></p>
+                <div id="debug"></div>
+
+                <div id="data_list">
+                </div>
+            </div>
+
+    
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-screen black-bg" id="my-qr-screen">
+        <div class="view black-bg">
+            <div class="page black-bg">
+                <div class="page-content qr-screen-content black-bg">
+                    <div width="100%" height="100%" style="width: 100% height:100%" id="reader" class="hidden">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-screen" id="my-confirm-screen">
+        <div class="view">
+            <div class="page">
+                <div class="navbar grey-bg">
+                  <div class="grey-bg"></div>
+                  <div class="navbar-inner">
+                    <a href="javascript:closeScreens();"><div class="title sliding font_araboto_bold link_black ">X     Wil je deze opslaan?</div></a>
+                    </div>
+                  </div>
+                <div class="toolbar toolbar-bottom larger-height">
+                    <div class="toolbar-inner center">
+                    <p>
+                        <a href="javascript:closeScreens();" class="button button-large button-outline button-round case_normal">      Nee, ga terug     </a>
+                        <br>
+                        <a href="javascript:greenOk();" class="button button-large button-fill side_color button-round case_normal">      SLA DEZE CODE OP     </a>
+                    </p>
+                    </div>
+                </div>
+                    
+                <div class="page block">
+                    <div class="block">
+                    <p>Achternaam</p>
+                    <div class="login-screen-title border-add" id="qrL">V</div>
+                    <p>Voornaam</p>
+                    <div class="login-screen-title border-add" id="qrF">K</div>
+
+                    <div class="row">
+                        <!-- Each "cell" has col-[width in percents] class -->
+                        <div class="col-35"><p>Geboortedag</p></div>
+                        <div class="col-65"><p>Geboortemaand</p></div>
+                    </div>                    
+                    <div class="row">
+                        <!-- Each "cell" has col-[width in percents] class -->
+                        <div class="col-35"><div class="login-screen-title border-add" id="qrD">06</div></div>
+                        <div class="col-65"><div class="login-screen-title border-add" id="qrM">OKT (10)</div></div>
+                    </div>                    
+                    <p class="center grey-light">Wil je deze opslaan?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="login-screen green-bg" id="my-green-screen">
+        <div class="view green-bg">
+            <div class="page green-bg">
+                <div class="navbar green-bg">
+                  <div class="green-bg"></div>
+                  <div class="navbar-inner">
+                    <a href="javascript:closeScreens()"><div class="title sliding font_araboto_bold link_black ">X</div></a>
+                    </div>
+                  </div>
+                <a href="javascript:closeScreens()">
+                <div class="page block green-bg">
+                  <div class="block green-bg">
+                        <p>
+                            <div class="center">
+                                <img data-src="img/ok.png" src="img/ok.png" width="761" height="551" class="lazy lazy-fade-in demo-lazy" />
+                            </div>
+                        </p>
+                        <p class="title sliding x-bigger font_araboto_bold center grey-green">Opgeslagen!</p>
+                    </div>
+                </div>
+                </a>
+            </div>
+       </div>
+    </div>
+
+    
+  </div>
+  <!-- CORDOVA_PLACEHOLDER_DONT_REMOVE -->
+  <!-- Framework7 library -->
+  <script src="framework7/framework7-bundle.min.js"></script>
+  <!-- Cordova APIs -->
+  <script src="js/cordova-app.js"></script>
+  <script type="text/javascript" src="cordova.js"></script>
+  
+  <!-- Fix Wasm loading -->
+    <script>
+    if(document.location.protocol != "http:" && document.location.protocol != "https:"){
+        //in app
+        var or_fetch=window.fetch;
+        
+        window.fetch = (url, info) => {
+          return new Promise(function(resolve, reject) {
+            let xhr = new XMLHttpRequest();
+            xhr.open((info && info.method) || "GET", url);
+            if (url.endsWith(".wasm") ) {
+                xhr.responseType = "arraybuffer";
+            } 
+            else {
+            }
+
+            xhr.onload = function() {
+              if (this.status >= 200 && this.status < 300) {
+                resolve({
+                  json: () => JSON.parse(xhr.response),
+                  ok: true,
+                  arrayBuffer: () => xhr.response
+                });
+              } else {
+                reject({
+                  status: this.status,
+                  statusText: xhr.statusText
+                });
+              }
+            };
+            xhr.onerror = function() {
+              reject({
+                status: this.status,
+                statusText: xhr.statusText
+              });
+            };
+            xhr.send();
+          });
+        };
+        WebAssembly.instantiateStreaming = undefined;
+        
+        
+        
+    }
+    else {
+        //On browser
+    }
+    
+  </script>
+  
+  <!-- Axios APIs -->
+  <script src="js/axios.min.js"></script>
+
+  <!-- QR Scanning -->
+  <script src="js/html5-qrcode.min.js"></script>
+  
+  <!-- international QR decoder -->
+  
+    <script src="js/pako.js"></script>
+    <script src="js/my_base45_2.js"></script>
+    <script src="js/cbor.js"></script>
+	<script src="js/disease-agent-targeted.js"></script>
+	<script src="js/vaccine-prophylaxis.js"></script>
+	<script src="js/vaccine-medicinal-product.js"></script>
+	<script src="js/vaccine-mah-manf.js"></script>
+	<script src="js/test-result.js"></script>
+	<script src="js/test-manf.js"></script>
+	<script src="js/test-type.js"></script>
+	<script src="js/trustlist.js"></script>
+  
+  <!-- Dutch QR codes -->
+    <script src="js/p5.min.js"></script>
+    <script src="js/jsQR.js"></script>
+    <script src="js/wasm_exec.js"></script>
+    
+  
+  
+
+  <!-- App routes -->
+  <script src="js/routes.js"></script>
+
+  <script src="js/localforage.min.js"></script>
+
+
+  <!-- App store -->
+  <script src="js/store.js"></script>
+  <!-- App scripts -->
+  <script src="js/app.js"></script>
+
+
+<script type="module">
+//esperimenti di decodifica
+console.log("keysList=",keysList);
+
+console.log(keysList.dsc_trust_list['IT'].keys[0].x5c);
+  import {X509} from 'https://cdn.skypack.dev/jsrsasign';
+//console.log("jsrasign",X509);
+var c = new X509();
+console.log(c);
+//console.log(c.getExtAIAInfo());
+// Italia:
+let myCert = keysList.dsc_trust_list['IT'].keys[0].x5c;
+ c.readCertPEM("-----BEGIN CERTIFICATE-----" + myCert + "-----END CERTIFICATE-----");
+console.log("Public key :", c.getPublicKey());  // public key as RSAKey object
+
+// Legge i certificati scaricabili da qui (sito ufficiale):
+// https://get.dgc.gov.it/v1/dgc/signercertificate/update
+
+// la pagina ne mostra solo uno, vanno letti tutti con un ciclo:
+
+/*
+const main = async function () {
+  const dcc = await DCC.fromImage('./data/your_certificate.png');
+  let headers = {};
+  let resp = null;
+  do {
+    resp = await fetch('https://get.dgc.gov.it/v1/dgc/signercertificate/update', {
+      headers,
+    })
+    headers = {'X-RESUME-TOKEN' : resp.headers.get('x-resume-token')};
+    const crt = `-----BEGIN CERTIFICATE-----\n${await resp.text()}\n-----END CERTIFICATE-----`;
+    try {
+      const verifier = rs.KEYUTIL.getKey(crt).getPublicKeyXYHex();
+      const verified = await dcc.checkSignature(verifier);
+      if (verified) {
+        console.log(dcc.payload);
+        break;
+      }
+    } catch {}
+  } while (resp.status === 200);
+};
+
+main();
+*/
+
+// Proviamo a leggerli...
+
+const main = async function () {
+  
+  let headers = {};
+  let resp = null;
+  let crt = "";
+  let debugStop = 0;
+  do {
+    resp = await fetch('https://win98.altervista.org/space/exploration/myp.php?pass=miapass&mode=native&url=https://get.dgc.gov.it/v1/dgc/signercertificate/update', {
+      headers,
+    })
+console.log(resp);
+    headers = {'X-RESUME-TOKEN' : resp.headers.get('x-resume-token')}; // Cannot work without a proxy properly relaying headers
+    crt = `-----BEGIN CERTIFICATE-----\n${await resp.text()}\n-----END CERTIFICATE-----`;
+	certificates.innerHTML += crt + "<br>" + resp.headers.get('x-resume-token') + "<br>" + debugStop + "<br>";
+	crt = "";
+
+    try {
+      //const verifier = rs.KEYUTIL.getKey(crt).getPublicKeyXYHex();
+      //const verified = await dcc.checkSignature(verifier);
+      //if (verified) {
+      //  console.log(dcc.payload);
+      //  break;
+      //}
+    } catch {}
+	debugStop++;
+  } while ((resp.status === 200) && (debugStop < 3));
+};
+
+//main();
+
+// Verifica signature:
+
+/*
+
+
+	let res = await fetch("assets/it_dgc_public_keys.json");
+	let keys = await res.json();
+	if (!keys) return null;
+	let eligible_keys = keys[kid];
+
+
+	if (!eligible_keys) return false;
+
+	let verified = false;
+	for (let k of eligible_keys) {
+		const key = PublicKey.fromPEM(
+			"-----BEGIN PUBLIC KEY-----\n"+
+			k+
+			"\n-----END PUBLIC KEY-----\n"
+		);
+
+		// Signature verification
+		const pk = key.keyRaw;
+		//const _keyB = pk.slice(0, 1);
+		const keyX = pk.slice(1, 1 + 32);
+		const keyY = pk.slice(33, 33 + 32);
+		try {
+			const verifier = { key: { x: keyX, y: keyY } };
+			await cose.sign.verify(greenpassRawData, verifier);
+
+			verified = true;
+			break;
+		}
+		catch(err) {
+			// try the next key;
+			console.error(err.message);
+  			console.error(err.stack);
+		}
+
+	}
+
+
+*/
+
+
+var pubKey = c.getPublicKey();
+console.log("c.getPublicKeyHex()",c.getPublicKeyHex());
+var hSerial    = c.getSerialNumberHex(); // '009e755e" hexadecimal string
+var sIssuer    = c.getIssuerString();    // '/C=US/O=z2'
+var sSubject   = c.getSubjectString();   // '/C=US/O=z2'
+var sNotBefore = c.getNotBefore();       // '100513235959Z'
+var sNotAfter  = c.getNotAfter();        // '200513235959Z'
+
+
+console.log("pubKey:" , pubKey);
+console.log("Serial number:" , hSerial);
+console.log("sIssuer" , sIssuer);
+console.log("sSubject" , sSubject);
+console.log("sNotBefore" , sNotBefore);
+console.log("sNotAfter" , sNotAfter);
+
+console.log("c.getInfo()",c.getInfo());
+
+console.log("getPublicKeyXYHex",pubKey.getPublicKeyXYHex());
+
+//const { Certificate } = require('@fidm/x509')
+
+/*
+https://github.com/kjur/jsrsasign/wiki/Tutorial-for-parsing-X.509-certificate
+-----BEGIN CERTIFICATE-----
+MIICYTCCAUmgAwIBAgIBAjANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdSb290
+IENBMCAXDTE3MDExMjE0NDUwMVoYDzIxMTcwMTEzMTQ0NTAxWjAcMRowGAYDVQQD
+DBFTZXJ2ZXIgRUNEU0EgY2VydDBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOI7
+NNxE483tJyIKT6KOQM5Zlfrigh12BEcHxnzpudgVHYA4aL5D5JulYGFzL0LQ5Q55
+GpCub1V2j+AhyBMKPQqjgYAwfjAdBgNVHQ4EFgQUSDzlr0Ayx22BljPtY6YRLTes
+qgwwHwYDVR0jBBgwFoAUcH8uroNoWZgEIyrN6z4XzSTdAUkwCQYDVR0TBAIwADAT
+BgNVHSUEDDAKBggrBgEFBQcDATAcBgNVHREEFTATghFTZXJ2ZXIgRUNEU0EgY2Vy
+dDANBgkqhkiG9w0BAQsFAAOCAQEAOJDgr1hRNuxW1D93yDWFwP1o2KuaI0BMZVFS
+6rzzLThCo3FeS6X7DCrBP699PCYcKeyMDmQwg9mVMABSZzox2GBO3hoqtnUXjsK3
+Qxh+4O5EmIXX4v8szdSBP14O2c5krAk4lbVWxLHE78NAc8dL94VORndyTcmaXUTn
+FQeBaRJjXto3okPvwYlczPS9sq0AhuBh5hwsLOYwpLf6/loPLjl40iwPQ+iqQ1EV
+m0Sac3o+0qI0cKiz4nXgd4NkFvV3G8lwd0Um8KSS/EFuZbgJNKKD6+1+90sibM4a
+Y/JiO6weK/VTlqCLn7zV9LcDT4gU18UCn85UV1XlVYKXZlaXYQ==
+-----END CERTIFICATE-----
+To get basic fields of the certificate:
+
+var c = new X509();
+c.readCertPEM("-----BEGIN CERTIFICATE(snip)...");
+var hSerial    = c.getSerialNumberHex(); // '009e755e" hexadecimal string
+var sIssuer    = c.getIssuerString();    // '/C=US/O=z2'
+var sSubject   = c.getSubjectString();   // '/C=US/O=z2'
+var sNotBefore = c.getNotBefore();       // '100513235959Z'
+var sNotAfter  = c.getNotAfter();        // '200513235959Z'
+To get subject public key as RSAKey object:
+
+var c = new X509();
+c.readCertPEM("-----BEGIN CERTIFICATE(snip)...");
+var pubKey = c.subjectPublicKeyRSA;  // public key as RSAKey object
+*/
+</script>
+
+</body>
+</html>
