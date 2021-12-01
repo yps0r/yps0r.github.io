@@ -35,10 +35,6 @@
   z-index: 6000;
 }
 
-.links-list a {
-    height:22px;
-}
-
 .larger {
     --f7-block-font-size: 16px;
 }
@@ -67,6 +63,10 @@
     font-weight: 600 !important;
     letter-spacing: 1px;
     font-size: 16px;
+}
+
+.block-title {
+    line-height:normal
 }
 
 .line_hr {
@@ -132,6 +132,17 @@
     text-transform: none;
 }
 
+.popup {
+    top:300px !important;
+    z-index: 14003 !important;
+    border-radius: 16px !important;
+}
+
+.popup-backdrop {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    z-index: 14000 !important;
+}
+
 .title {
     margin-left: 12px !important;
 }
@@ -191,3 +202,157 @@ img.demo-lazy {
     background-size: cover;
     height: 30vw;
   }
+  
+        ::backdrop {
+            background-color: white;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            z-index: 0;
+            margin: 0px;
+        }
+
+        a {
+            text-decoration: none;
+            font-weight: 600;
+            color: #000;
+        }
+
+        :root {
+            --fs-xl: clamp(2.5rem, 2vw + 2.5rem, 5rem);
+            --fs-head: clamp(2rem, 2rem + 1vw, 5rem);
+            --fs-subhead: clamp(1rem, 1rem + 1vw, 2rem);
+            --fs-basic: 1.3rem;
+            --fs-small: .8rem;
+            font-size: 70%;
+        }
+
+        .subhead {
+            font-size: var(--fs-subhead);
+            display: inline-block;
+            line-height: 2rem;
+            font-family: "Montserrat";
+        }
+
+        #qrcode {
+            align-content: center;
+            justify-content: center;
+            justify-items: center;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .header {
+            display: grid;
+            grid-template-columns: 1fr 4fr 1fr;
+            height: 2rem;
+            padding: 2rem;
+            align-content: center;
+            justify-content: center;
+            justify-items: center;
+            width: 100%;
+        }
+
+        .middle {
+            z-index: 2;
+            align-content: center;
+            justify-content: center;
+            justify-items: center;
+            position: relative;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+
+        .arrow {
+            background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='15pt' height='13pt' viewBox='0 0 15 13' version='1.1'%3E%3Cg id='surface1'%3E%3Cpath style=' stroke:none;fill-rule:nonzero;fill:rgb(0%25,0%25,0%25);fill-opacity:1;' d='M 4.457031 5.132812 C 4.988281 4.574219 7.09375 2.367188 7.125 2.335938 C 7.621094 1.792969 7.621094 0.953125 7.125 0.40625 C 6.625 -0.132812 5.789062 -0.132812 5.285156 0.40625 C 5.253906 0.445312 0.382812 5.535156 0.382812 5.535156 C -0.132812 6.074219 -0.132812 6.953125 0.382812 7.460938 C 0.382812 7.460938 5.171875 12.503906 5.285156 12.605469 C 5.785156 13.128906 6.601562 13.128906 7.125 12.605469 C 7.621094 12.066406 7.621094 11.1875 7.125 10.664062 C 7.023438 10.5625 4.4375 7.867188 4.4375 7.867188 L 13.695312 7.867188 C 14.414062 7.867188 14.996094 7.253906 14.996094 6.503906 C 14.996094 5.75 14.410156 5.140625 13.695312 5.140625 L 4.457031 5.140625 Z M 4.457031 5.132812 '/%3E%3C/g%3E%3C/svg%3E%0A");
+            width: 100%;
+            background-repeat: no-repeat;
+        }
+
+        .footer {
+            position: absolute;
+            margin-top: clamp(20px, 8vh, 10rem);
+        }
+
+        #animatie {
+            z-index: 1;
+            position: fixed;
+            left: 0%;
+            right: 0;
+            width: 100%;
+            background-color: white;
+            bottom: -2%;
+        }
+        
+        
+        
+        
+.show{
+			width:95%;
+    overflow:hidden;
+			margin:0 auto;
+			height:100px;
+			border:5px solid #eee;
+			border-radius:5px;
+			font-size:14px;
+    
+		}
+		
+		 
+
+.swiper-container {
+    left:16px;
+}
+.swiper1 {
+        width: 100%;
+    }
+.swiper1 .selected{
+  color:#000000;
+  border-bottom:2px solid #000000;
+}
+
+.swiper1 .swiper-slide {
+        text-align: center;
+        font-size: 18px;
+        height:50px;
+        /* Center slide text vertically */
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+        cursor:pointer;
+}
+
+.swiper2 {
+  width: 100%;
+  height: 3000px;
+} 
+
+.swiper-slide-line {
+  border-bottom:1px solid #C0C0C0;
+}
+
+.50perc {
+    width: 40% !important;
+    margin-right: 0px !important;
+}
+
+
+.card {
+    border-radius: 16px !important;
+    box-shadow: 0px 0px 11px 3px rgba(0, 0, 0, 0.16);
+    margin-right: 32px !important;
+}

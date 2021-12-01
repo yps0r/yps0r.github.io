@@ -57,6 +57,22 @@ module.exports = [
         "id": "cordova-plugin-statusbar.StatusBarProxy",
         "pluginId": "cordova-plugin-statusbar",
         "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-android-permissions/www/permissions-dummy.js",
+        "id": "cordova-plugin-android-permissions.Permissions",
+        "pluginId": "cordova-plugin-android-permissions",
+        "clobbers": [
+            "cordova.plugins.permissions"
+        ]
+    },
+    {
+        "file": "plugins/cordova-plugin-chooser/www/chooser.js",
+        "id": "cordova-plugin-chooser.Chooser",
+        "pluginId": "cordova-plugin-chooser",
+        "clobbers": [
+            "chooser"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -64,9 +80,11 @@ module.exports.metadata =
 {
     "cordova-plugin-device": "2.0.3",
     "cordova-plugin-insomnia": "4.3.0",
-    "cordova-plugin-whitelist": "1.3.5",
     "phonegap-plugin-barcodescanner": "8.1.0",
-    "cordova-plugin-statusbar": "2.4.3"
+    "cordova-plugin-statusbar": "2.4.3",
+    "cordova-plugin-android-permissions": "1.1.2",
+    "cordova-plugin-whitelist": "1.3.5",
+    "cordova-plugin-chooser": "1.3.1"
 }
 // BOTTOM OF METADATA
 });
