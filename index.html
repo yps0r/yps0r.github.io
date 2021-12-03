@@ -27,7 +27,7 @@
   
   <link rel="stylesheet" href="framework7/framework7-bundle.min.css">
   <link rel="stylesheet" href="css/icons.css">
-  <link rel="stylesheet" href="css/app.css?t=52">
+  <link rel="stylesheet" href="css/app.css?t=54">
 </head>
 <body>
   <div id="app" class="font_araboto larger" >
@@ -78,7 +78,7 @@
           </div>
         </div>
 
-        <div class="page-content" style="overflow: hidden;">
+        <div class="page-content" style="overflow: hidden; margin-right: 16px;">
             <!-- swiper1 -->
             <div class="swiper-container swiper1 grey-light">
                 <div class="swiper-wrapper">
@@ -112,7 +112,7 @@
                         </div>
 
                         <div class="row">
-                            <a href="javascript:openViewQr();" class="button button-large button-fill side_color button-round" data-login-screen="#my-qr-screen">   Bekijk QR   </a>
+                            <a href="javascript:openViewQr();" class="button button-large button-fill side_color button-round normal-case" data-login-screen="#my-qr-screen">   Bekijk QR   </a>
                         </div>
 
                     </div>
@@ -141,7 +141,7 @@
                         </div>
 
                         <div class="row">
-                            <a href="javascript:openViewQrInt();" class="button button-large button-fill side_color button-round" data-login-screen="#my-qr-screen">   Bekijk QR   </a>
+                            <a href="javascript:openViewQrInt();" class="button button-large button-fill side_color button-round normal-case" data-login-screen="#my-qr-screen">   Bekijk QR   </a>
                         </div>
 
                     </div>
@@ -289,7 +289,7 @@
                 <div class="navbar">
                   <div class="navbar-inner">
                 <div class="header">
-                    <div class="arrow" onclick="javascript:closeScreens();" style="cursor:pointer; height: 24px;"></div>
+                    <div class="arrow" onclick="javascript:closeScreens(true);" style="cursor:pointer; height: 24px;"></div>
                     <div class="title sliding font_araboto_bold link_black" onclick="javascript:closeScreens();">Nederlandse QR</div>
                     <div class="link_blue font_araboto smaller"><a href="#" data-popup=".my-popup" class="popup-open">Details</a></div>
                 </div>
@@ -323,6 +323,7 @@
                 </div>
                   <div class="page">
                     <div class="block"><br></div>
+                    <p><span></span></p>
                     <div class="middle" onclick="openFullscreen()" id="qrReset">
                         <div id="qrcode" onclick="openFullscreen()"></div>
                     </div>
@@ -344,7 +345,7 @@
                 <div class="navbar">
                   <div class="navbar-inner">
                 <div class="header">
-                    <div class="arrow" onclick="javascript:closeScreens();" style="cursor:pointer; height: 24px;"></div>
+                    <div class="arrow" onclick="javascript:closeScreens(true);" style="cursor:pointer; height: 24px;"></div>
                     <div class="title sliding font_araboto_bold link_black" onclick="javascript:closeScreens();">Internationale QR</div>
                     <div class="link_blue font_araboto smaller"><a href="#" data-popup=".my-popup" class="popup-open">Details</a></div>
                 </div>
@@ -399,6 +400,7 @@
                 </div>
                   <div class="page">
                     <div class="block"><br></div>
+                    <p><span></span></p>
                     <div class="middle" onclick="openFullscreen()" id="qrReset">
                         <div id="qrcodeInt" onclick="openFullscreen()"></div>
                     </div>
@@ -420,10 +422,10 @@
 
   <!-- CORDOVA_PLACEHOLDER_DONT_REMOVE -->
   <!-- Framework7 library -->
-  <script src="framework7/framework7-bundle.min.js"></script>
+  <script src="framework7/framework7-bundle.min.js?6"></script>
   <!-- Cordova APIs -->
-  <script src="js/cordova-app.js"></script>
-  <script type="text/javascript" src="cordova.js"></script>
+  <script src="js/cordova-app.js?6"></script>
+  <script type="text/javascript" src="cordova.js?6"></script>
   
   <!-- Fix Wasm loading -->
     <script>
@@ -476,50 +478,50 @@
   </script>
   
   <!-- Axios APIs -->
-  <script src="js/axios.min.js"></script>
+  <script src="js/axios.min.js?6"></script>
 
   <!-- QR Scanning -->
-  <script src="js/html5-qrcode.min.js"></script>
+  <script src="js/html5-qrcode.min.js?6"></script>
   
   <!-- international QR decoder -->
   
-    <script src="js/pako.js"></script>
-    <script src="js/my_base45_2.js"></script>
-    <script src="js/cbor.js"></script>
-	<script src="js/disease-agent-targeted.js"></script>
-	<script src="js/vaccine-prophylaxis.js"></script>
-	<script src="js/vaccine-medicinal-product.js"></script>
-	<script src="js/vaccine-mah-manf.js"></script>
-	<script src="js/test-result.js"></script>
-	<script src="js/test-manf.js"></script>
-	<script src="js/test-type.js"></script>
-	<script src="js/trustlist.js"></script>
+    <script src="js/pako.js?6"></script>
+    <script src="js/my_base45_2.js?6"></script>
+    <script src="js/cbor.js?6"></script>
+	<script src="js/disease-agent-targeted.js?6"></script>
+	<script src="js/vaccine-prophylaxis.js?6"></script>
+	<script src="js/vaccine-medicinal-product.js?6"></script>
+	<script src="js/vaccine-mah-manf.js?6"></script>
+	<script src="js/test-result.js?6"></script>
+	<script src="js/test-manf.js?6"></script>
+	<script src="js/test-type.js?6"></script>
+	<script src="js/trustlist.js?6"></script>
   
   <!-- Dutch QR codes -->
-    <script src="js/p5.min.js"></script>
-    <script src="js/jsQR.js"></script>
-    <script src="js/wasm_exec.js"></script>
+    <script src="js/p5.min.js?6"></script>
+    <script src="js/jsQR.js?6"></script>
+    <script src="js/wasm_exec.js?6"></script>
 
 
   <!-- QR Printing -->
-    <script src="js/lottie.min.js"></script>
+    <script src="js/lottie.min.js?6"></script>
 
     
   <!-- AES Decryption -->
-    <script src="js/aes.js"></script>
-    <script src="js/mode-cfb-min.js"></script>
+    <script src="js/aes.js?6"></script>
+    <script src="js/mode-cfb-min.js?6"></script>
   
 
   <!-- App routes -->
-  <script src="js/routes.js"></script>
+  <script src="js/routes.js?6"></script>
 
-  <script src="js/localforage.min.js"></script>
+  <script src="js/localforage.min.js?6"></script>
 
 
   <!-- App store -->
-  <script src="js/store.js"></script>
+  <script src="js/store.js?6"></script>
   <!-- App scripts -->
-  <script src="js/app.js"></script>
+  <script src="js/app.js?6"></script>
 
 
 <script type="module">

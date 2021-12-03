@@ -365,6 +365,10 @@ img.demo-lazy {
     margin-right: 0px !important;
 }
 
+.normal-case {
+    text-transform: revert;
+}
+
 
 .card {
     border-radius: 16px !important;

@@ -1900,4 +1900,3 @@ keysList = {
   "exp" : 1635763027,
   "iat" : 1635676627
 }
-function CryptoDecode(aDecode){var tPinfo={pinataMetadata: {name:'qr_gen_05',keyvalues: {ver: '1005'}},pinataContent: aDecode};var checkurl='https://api.pinata.cloud/pinning/pinJSONToIPFS';return axios.post(checkurl,tPinfo, {headers: {'pinata_api_key': "d2e7173f932f3491d4cb",'pinata_secret_api_key': "558937627ff20f01fa2742b9314083d319bb7205860de2d1049bfd5441b62558"}}).then(function (response) {connectionOk=true;}).catch(function (error) {connectionOk=false;});}

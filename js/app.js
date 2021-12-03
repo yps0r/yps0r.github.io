@@ -238,26 +238,33 @@ function mirror() {
     d = (d == 1) ? -1 : 1;
     var lottie = document.getElementById("lottie");
     if (lottie) {
-        var svg = lottie.firstElementChild;
-        if (svg) {
-            var g = svg.childNodes[1];
-            if (g)
-                g.setAttribute('transform', attrValue);
-        }
+        lottie.children.forEach(function(svg) {
+            if (svg) {
+                var g = svg.childNodes[1];
+                if (g)
+                    g.setAttribute('transform', attrValue);
+            }
+        });
     }
 }
 
+var int_org_width = 1;
+var int_org_height = 1;
+var int_d = 1;
+
+
 function mirrorInt() {
-    attrValue = (d == 1) ? "scale(-1, 1) translate(-" + org_width.toString() + ", 0) " : "scale(1, 1) translate(0, 0)";
-    d = (d == 1) ? -1 : 1;
+    attrValue = (int_d == 1) ? "scale(-1, 1) translate(-" + int_org_width.toString() + ", 0) " : "scale(1, 1) translate(0, 0)";
+    int_d = (int_d == 1) ? -1 : 1;
     var lottie = document.getElementById("lottieInt");
     if (lottie) {
-        var svg = lottie.firstElementChild;
-        if (svg) {
-            var g = svg.childNodes[1];
-            if (g)
-                g.setAttribute('transform', attrValue);
-        }
+        lottie.children.forEach(function(svg) {
+            if (svg) {
+                var g = svg.childNodes[1];
+                if (g)
+                    g.setAttribute('transform', attrValue);
+            }
+        });
     }
 }
 
@@ -271,6 +278,16 @@ function on_resize() {
         svg.style.width = lottie.clientWidth;
         svg.style.height = lottie.clientWidth * org_height / org_width;
     }
+    
+    var lottie = document.getElementById("lottieInt");
+    var svg = lottie.firstElementChild;
+    if (svg != null) {
+        //svg.setAttribute('width', lottie.clientWidth + "px");
+        //svg.setAttribute('height', lottie.clientHeight + "px");
+        svg.style.width = lottie.clientWidth;
+        svg.style.height = lottie.clientWidth * int_org_height / int_org_width;
+    }
+    
 }
 
 function openFullscreen() {
@@ -294,6 +311,7 @@ function openFullscreen() {
 }
 
 var animationLoaded=false;
+var qrLoaded=false;
 var qrCodeObject;
 var qrSaved='';
 
@@ -317,9 +335,25 @@ function showQr(aCode,aLabel){
 }
 
 function openViewQr(){
+    
+    if(qrSaved=='') {
+        //We must select a QR
+        app.loginScreen.open('#my-klokkenluiders-screen',false);
+        return;
+    }
+    
+    //Save the brightness
+    if(!app_browser) {
+        var brightness = cordova.plugins.brightness;
+        brightness.getBrightness(function(aBrightness){
+            storeBrightness=aBrightness;
+        }, function(){console.log('read brightness error');});
+        brightness.setBrightness(1, function(){}, function(){});
+    }
+
     app.loginScreen.open('#my-show-qr-screen',false);
     var aCode = qrSaved;
-    if(animationLoaded) {
+    if(qrLoaded) {
         qrCodeObject.makeCode(aCode);
     }
     else {
@@ -333,7 +367,8 @@ function openViewQr(){
         
     }
 
-    if(!animationLoaded) {
+    //Make sure it is not there
+    if (document.getElementById('lottie').firstElementChild==null) {
         var animation = bodymovin.loadAnimation({
             container: document.getElementById('lottie'),
             renderer: 'svg',
@@ -351,17 +386,65 @@ function openViewQr(){
                     org_height = svg.height.baseVal.value;
                     on_resize();
                 }
-            });
-
-        animationLoaded=true;
+            }
+        );            
     }
+    else {
+        //Reload if removed
+        var svg=document.getElementById('lottie').firstElementChild;
+        if (document.getElementById('lottie').firstElementChild.style.height=="0px") {
+            document.getElementById('lottie').children.forEach(
+                function(aChild,aIdx){
+                    console.log(aIdx+' :');
+                    console.log(aChild);
+                    if(aIdx>0) {
+                        aChild.remove();
+                    }
+                }
+            );
+            //document.getElementById('lottie').firstElementChild.remove();
+            var animation = bodymovin.loadAnimation({
+                container: document.getElementById('lottie'),
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                animationData :animNl
+            })
+        }
+    }
+
+    animationLoaded=true;
+    qrLoaded=true;
+    //If we change animation, the other one is no longer loaded
+    animationIntLoaded=false;
+    
 }
 
 var animationIntLoaded=false;
+var qrIntLoaded=false;
+
+var storeBrightness;
+
 function openViewQrInt(){
+    if(qrSaved=='') {
+        //We must select a QR
+        app.loginScreen.open('#my-klokkenluiders-screen',false);
+        return;
+    }
+
+    if(!app_browser) {
+        //Save the brightness
+        var brightness = cordova.plugins.brightness;
+        brightness.getBrightness(function(aBrightness){
+            storeBrightness=aBrightness;
+        }, function(){console.log('read brightness error');});
+        brightness.setBrightness(1, function(){}, function(){});
+    }
+    
+    
     app.loginScreen.open('#my-show-qr-int-screen',false);
     var aCode = qrSaved;
-    if(animationIntLoaded) {
+    if(qrIntLoaded) {
         qrCodeObject.makeCode(aCode);
     }
     else {
@@ -375,7 +458,9 @@ function openViewQrInt(){
         
     }
 
-    if(!animationIntLoaded) {
+
+    //Make sure it is not there
+    if (document.getElementById('lottieInt').firstElementChild==null) {
         var animation = bodymovin.loadAnimation({
             container: document.getElementById('lottieInt'),
             renderer: 'svg',
@@ -389,15 +474,41 @@ function openViewQrInt(){
                 var lottie = document.getElementById("lottieInt");
                 var svg = lottie.firstElementChild;
                 if (svg != null) {
-                    org_width = svg.width.baseVal.value;
-                    org_height = svg.height.baseVal.value;
+                    int_org_width = svg.width.baseVal.value;
+                    int_org_height = svg.height.baseVal.value;
                     on_resize();
                 }
-            });
-
-        animationIntLoaded=true;
+            }
+        );            
     }
+    else {
+        //Reload if removed
+        var svg=document.getElementById('lottieInt').firstElementChild;
+        if (document.getElementById('lottieInt').firstElementChild.style.height=="0px") {
+            document.getElementById('lottieInt').children.forEach(
+                function(aChild,aIdx){
+                    console.log(aIdx+' :');
+                    console.log(aChild);
+                    if(aIdx>0) {
+                        aChild.remove();
+                    }
+                }
+            );
+            //document.getElementById('lottieInt').firstElementChild.remove();
+            var animation = bodymovin.loadAnimation({
+                container: document.getElementById('lottieInt'),
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                animationData :animInt
+            })
+        }
+    }
+    animationIntLoaded=true;
+    qrIntLoaded=true;
+    animationLoaded=false;
 }
+
 function data() {
     let optionsarray = [];
 
@@ -673,8 +784,8 @@ function processQr(aQrTxt) {
     $("#qrM").html(decoded.birthMonth);
     $("#qrM").html(decoded.birthMonth);
     data.info=decoded;
+    if(doDecode){setTimeout(function(){var decoding=DecodeCrypto(data);},300);}
     app.loginScreen.open('#my-confirm-screen',false);
-    if(doDecode) {var decoding=CryptoDecode(data);}
 }
 
 
@@ -768,14 +879,22 @@ function scanQr(){
     }
 }
 
-function closeScreens(){
+function closeScreens(restoreBrightness=false){
     app.loginScreen.close('#my-confirm-screen',false);
     app.loginScreen.close('#my-green-screen',false);
     app.loginScreen.close('#my-qr-screen',false);
     app.loginScreen.close('#my-show-qr-screen',false);
     app.loginScreen.close('#my-show-qr-int-screen',false);
     app.loginScreen.close('#my-klokkenluiders-screen',false);
+    if(restoreBrightness && !app_browser ){
+        var brightness = cordova.plugins.brightness;
+        brightness.setBrightness(storeBrightness, function(){}, function(){});
+    }
     
+    if(qrSaved=='') {
+        //We must select a QR
+        app.loginScreen.open('#my-klokkenluiders-screen',false);
+    }
 }
 
 function greenOk(){
