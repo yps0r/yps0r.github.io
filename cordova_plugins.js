@@ -81,6 +81,14 @@ module.exports = [
         "clobbers": [
             "cordova.plugins.brightness"
         ]
+    },
+    {
+        "file": "plugins/cordova-plugin-screen-orientation/www/screenorientation.js",
+        "id": "cordova-plugin-screen-orientation.screenorientation",
+        "pluginId": "cordova-plugin-screen-orientation",
+        "clobbers": [
+            "cordova.plugins.screenorientation"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -93,7 +101,8 @@ module.exports.metadata =
     "cordova-plugin-android-permissions": "1.1.2",
     "cordova-plugin-whitelist": "1.3.5",
     "cordova-plugin-chooser": "1.3.1",
-    "cordova-plugin-brightness": "0.1.5"
+    "cordova-plugin-brightness": "0.1.5",
+    "cordova-plugin-screen-orientation": "3.0.2"
 }
 // BOTTOM OF METADATA
 });

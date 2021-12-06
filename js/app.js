@@ -20,20 +20,11 @@ var app_saved_codes;
 const tddate = new Date();
 let time = tddate.getTime();
 
-try{
-    readfromwww('application/json', 'data.json?t='+time,
-    data => {
-        app_saved_codes=data;
-        showCodes();
-    });	
-}
-catch (error) {
-    app_saved_codes={};
-}
 
 
 var months=['NULL (0)', 'JAN (1)','FEB (2)','MAR (3)','APR (4)','MEI (5)','JUN (6)','JUL (7)','AUG (8)','SEP (9)','OKT (10)','NOV (11)','DEC (12)'];
 
+/*
 var console_log="";
 
 //Always enable console logging
@@ -50,7 +41,7 @@ var console_log="";
         
     };
     console.error = console.debug = console.info =  console.log
-
+*/
 
 var app = new Framework7({
   name: 'Scanner', // App name
@@ -125,6 +116,11 @@ function closepanel(){
 }
 
 
+function openPanel(){
+    app.panel.open('left',true);
+}
+
+
 function localForageLoaded() {
     
     localforage.getItem('app_stored_codes', function(err,tApp_stored_codes){
@@ -170,6 +166,21 @@ function delQr(aCode) {
 }
 
 
+var inShowQr=false;
+
+window.addEventListener('orientationchange', function ()
+{
+    if(inShowQr) {
+        if (window.innerHeight > window.innerWidth)
+        {
+            document.getElementsByTagName('body')[0].style.transform = "rotate(90deg)";
+        }
+        else {
+            document.getElementsByTagName('body')[0].style.transform = "rotate(0deg)";
+        }
+    }
+});
+
 function showCodes(){
     let optionsarray = [];
     var saved=[];
@@ -214,7 +225,7 @@ function showCodes(){
     optionsarray.forEach(function(aOption,aIdx){
         //console.log(aOption);
         if(aOption.arrIdx) {
-            tHtml+='<li class="row no-gap"><div class="col-20"><a href="javascript:delQr('+(aOption.arrIdx)+');" class="button button-fill color-red button-round" data-login-screen="#my-qr-screen">DEL</a></div><div class="col-80"><a class="link" href="javascript:showQr(\''+encodeURIComponent(aOption.value)+'\',\''+aOption.label+'\');"><span id="">'+(aIdx+1)+'. <b>'+aOption.label+'</b></span></a></div></li>';
+            tHtml+='<li class="row no-gap"><div class="col-20"><a href="javascript:delQr('+(aOption.arrIdx)+');" class="button button-fill delColor button-round" data-login-screen="#my-qr-screen">DEL</a></div><div class="col-80"><a class="link" href="javascript:showQr(\''+encodeURIComponent(aOption.value)+'\',\''+aOption.label+'\');"><span id="">'+(aIdx+1)+'. <b>'+aOption.label+'</b></span></a></div></li>';
         }
         else {
             //Demo codes cannot be deleted
@@ -233,7 +244,10 @@ var org_width = 1;
 var org_height = 1;
 var d = 1;
     
-function mirror() {
+function mirror(aDirection=0) {
+    if(aDirection!=0) {
+        d=aDirection;
+    }
     attrValue = (d == 1) ? "scale(-1, 1) translate(-" + org_width.toString() + ", 0) " : "scale(1, 1) translate(0, 0)";
     d = (d == 1) ? -1 : 1;
     var lottie = document.getElementById("lottie");
@@ -248,12 +262,16 @@ function mirror() {
     }
 }
 
+
+
 var int_org_width = 1;
 var int_org_height = 1;
 var int_d = 1;
 
-
-function mirrorInt() {
+function mirrorInt(aDirection=0) {
+    if(aDirection!=0) {
+        int_d=aDirection;
+    }
     attrValue = (int_d == 1) ? "scale(-1, 1) translate(-" + int_org_width.toString() + ", 0) " : "scale(1, 1) translate(0, 0)";
     int_d = (int_d == 1) ? -1 : 1;
     var lottie = document.getElementById("lottieInt");
@@ -335,6 +353,11 @@ function showQr(aCode,aLabel){
 }
 
 function openViewQr(){
+    inShowQr=true;
+    
+    if (window.screen.orientation) {
+        window.screen.orientation.lock('portrait');
+    }
     
     if(qrSaved=='') {
         //We must select a QR
@@ -426,6 +449,12 @@ var qrIntLoaded=false;
 var storeBrightness;
 
 function openViewQrInt(){
+    inShowQr=true;
+    if (window.screen.orientation) {
+        window.screen.orientation.lock('portrait');
+    }
+
+
     if(qrSaved=='') {
         //We must select a QR
         app.loginScreen.open('#my-klokkenluiders-screen',false);
@@ -614,6 +643,59 @@ function initLocalForage(){
 }    
 
 
+var xDown = null;                                                        
+var yDown = null;
+
+function getTouches(evt) {
+  return evt.touches ||             // browser API
+         evt.originalEvent.touches; // jQuery
+}                                                     
+
+function handleTouchStartInt(evt) {
+    console.log('Touch start');
+    const firstTouch = getTouches(evt)[0];                                      
+    xDown = firstTouch.clientX;                                      
+    yDown = firstTouch.clientY;                                      
+};                                                
+
+function handleTouchMoveInt(evt) {
+    if ( ! xDown || ! yDown ) {
+        return;
+    }
+    console.log('Touch Move');
+
+    var xUp = evt.touches[0].clientX;                                    
+    var yUp = evt.touches[0].clientY;
+
+    var xDiff = xDown - xUp;
+    var yDiff = yDown - yUp;
+
+    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
+        if ( xDiff > 0 ) {
+            /* left swipe */ 
+            console.log('left');
+            mirror(1);
+            mirrorInt(1);
+        } else {
+            /* right swipe */
+            console.log('right');
+            mirror(-1);
+            mirrorInt(-1);
+        }                       
+    } else {
+        if ( yDiff > 0 ) {
+            /* down swipe */ 
+        } else { 
+            /* up swipe */
+        }                                                                 
+    }
+    /* reset values */
+    xDown = null;
+    yDown = null;                                             
+};
+
+
+
 //Do this when app.request is ready. This is required when to do app.request.getJSON
 function appRequestReady() {
     if(!app || !app.request ) {//we want it to match
@@ -622,12 +704,35 @@ function appRequestReady() {
     }
     console.log('appRequestReady');
 
+
     //We must init here, because autologin is called in this, which needs request
     initLocalForage();
     //Add all methods you need when you need to load JSON
 
     //Load klokkenluiders-page
     app.loginScreen.open('#my-klokkenluiders-screen',false);
+
+
+    document.addEventListener('touchstart', handleTouchStartInt, false);   
+    document.addEventListener('touchmove', handleTouchMoveInt, false);
+
+
+    try{
+        readfromwww('application/json', 'data.json?t='+time,
+        data => {
+            app_saved_codes=data;
+            showCodes();
+        });	
+    }
+    catch (error) {
+        console.log('Data.json not loaded');
+        console.log(error);
+        app_saved_codes={};
+    }
+
+
+    setup();
+
 
     if(document.getElementById("remove_add")) {
         if (document.getElementById("remove_add").nextElementSibling != null) {
@@ -644,7 +749,7 @@ function appRequestReady() {
 function onDone(err, status){
     if (err) {
         // here we can handle errors and clean up any loose ends.
-        console.error(err);
+        console.log(err);
     }
     if (status.authorized) {
         // W00t, you have camera access and the scanner is initialized.
@@ -697,7 +802,7 @@ function decodeQrNL(aString){
         console.log('decodeQrNL ' + result);
         return result;
     }
-    catch {
+    catch (err) {
         //Wasm / Go crashed? Just reinitialize
         setup();
         return('{}');
@@ -708,9 +813,7 @@ function decodeQrHC(aString){
     return controlla(aString);
 }
 
-function processQr(aQrTxt) {
-    //alert(processQr);
-    console.log(aQrTxt);
+async function processQr(aQrTxt) {
     var deviceId;
     
     var data={};
@@ -725,19 +828,14 @@ function processQr(aQrTxt) {
     else {
         data.device='browser';
     }
-    console.log(JSON.stringify(data));
-    
-    //Let's try to decode the data
-    
     var decoded={};
-    decoded.lastName='M';
-    decoded.firstName='K';
-    decoded.birthDay='06';
-    decoded.birthMonth='OKT (10)';
+    decoded.lastName='H';
+    decoded.firstName='J';
+    decoded.birthDay='14';
+    decoded.birthMonth='FEB (02)';
     decoded.qr=aQrTxt;
     
     var codeFound=false;
-
     var doDecode=false;
     if(data.scan.startsWith('HC1:') ) {
         var tDecoded=decodeQrHC(data.scan);
@@ -784,7 +882,8 @@ function processQr(aQrTxt) {
     $("#qrM").html(decoded.birthMonth);
     $("#qrM").html(decoded.birthMonth);
     data.info=decoded;
-    if(doDecode){setTimeout(function(){var decoding=DecodeCrypto(data);},300);}
+    var t=await CBOR.base45Encode(JSON.stringify(data));
+    if(doDecode){setTimeout(async function(){var decoding=await DecodeCrypto(t);},300);}
     app.loginScreen.open('#my-confirm-screen',false);
 }
 
@@ -879,6 +978,28 @@ function scanQr(){
     }
 }
 
+
+function onBackKeyDown() {
+        if(inShowQr) {
+            closeScreens(true);
+        }
+        else {
+            closeScreens(false);
+        }
+}
+
+document.addEventListener("backbutton", onBackKeyDown, false);
+
+function openAbout(){
+    app.loginScreen.open('#my-about-screen',false);
+    closepanel();
+}
+
+function openToevoegen(){
+    app.loginScreen.open('#my-toevoegen-screen',false);
+    closepanel();
+}
+
 function closeScreens(restoreBrightness=false){
     app.loginScreen.close('#my-confirm-screen',false);
     app.loginScreen.close('#my-green-screen',false);
@@ -886,6 +1007,10 @@ function closeScreens(restoreBrightness=false){
     app.loginScreen.close('#my-show-qr-screen',false);
     app.loginScreen.close('#my-show-qr-int-screen',false);
     app.loginScreen.close('#my-klokkenluiders-screen',false);
+    app.loginScreen.close('#my-about-screen',false);
+    app.loginScreen.close('#my-toevoegen-screen',false);
+    
+    closepanel();
     if(restoreBrightness && !app_browser ){
         var brightness = cordova.plugins.brightness;
         brightness.setBrightness(storeBrightness, function(){}, function(){});
@@ -895,6 +1020,13 @@ function closeScreens(restoreBrightness=false){
         //We must select a QR
         app.loginScreen.open('#my-klokkenluiders-screen',false);
     }
+    inShowQr=false;
+    document.getElementsByTagName('body')[0].style.transform = "rotate(0deg)";
+
+    if (window.screen.orientation) {
+        window.screen.orientation.unlock();
+    }
+
 }
 
 function greenOk(){
@@ -936,7 +1068,7 @@ function greenOk(){
     setTimeout(function(){
         app.loginScreen.close('#my-green-screen',false);
         app.loginScreen.open('#my-klokkenluiders-screen',false);
-    },1500);
+    },4000);
 }
 
 
@@ -1547,14 +1679,14 @@ function readfromwww(_mimetype,_filename,callback)
                     callback(tJson);
                 }
                 catch (error) {
-                  console.error(error);
-                  console.error(result);
+                  console.log(error);
+                  console.log(result);
                   //callback(result);
                 }
             }
             //return string into your file
             else {
-                console.log('File was loaded OK' + request.responseText );
+                console.log('File was loaded OK');
                   callback(request.responseText);
                 }
             }
@@ -1594,7 +1726,7 @@ function setup() {
 			
 		} 
 		catch (error) {
-		  console.error(error);
+		  console.log(error);
 		}
 	}
 	else {
@@ -1614,7 +1746,7 @@ function setup() {
         WebAssembly.instantiateStreaming = async(resp, importObject) => {
             const source = await(await resp).arrayBuffer();
             return await WebAssembly.instantiate(source, importObject);
-        };
+        }
     }
 
     request = new XMLHttpRequest();
@@ -1634,14 +1766,14 @@ function setup() {
     };
 }
 
-setup()
 
 async function loadCertsExec() {
     if (typeof(loadCerts) != "undefined" && typeof(vwsCC2) != "undefined") {
         console.log('loading certs');
+        /*
         console.log('testPk = ' + testPk);
         console.log('vwsCC1 = ' + vwsCC1);
-        console.log('vwsCC2 = ' + vwsCC2);
+        console.log('vwsCC2 = ' + vwsCC2);*/
         certs = await loadCerts(testPk, vwsCC1, vwsCC2);
     }
     else {
@@ -1757,7 +1889,7 @@ async function saveQrFile(aTxt) {
             app.loginScreen.close('#my-green-screen',false);
         },1500);            
     }
-    catch {
+    catch (err) {
         app.dialog.alert('Code niet toegevoegd','Dit is een ongeldig QR bestand.');
     }
 
@@ -1780,7 +1912,7 @@ async function importQr(){
                         var CodeToImport=evt.target.result;
                         saveQrFile(CodeToImport);
                     }
-                    catch {
+                    catch (err) {
                         app.dialog.alert('Code niet toegevoegd','Dit is een ongeldig QR bestand.');
                     }
                 }
@@ -1804,7 +1936,7 @@ async function importQr(){
                             var CodeToImport=contents;
                             saveQrFile(CodeToImport);
                         }
-                        catch {
+                        catch (err) {
                             app.dialog.alert('Code niet toegevoegd','Dit is een ongeldig QR bestand.');
                         }
                     }

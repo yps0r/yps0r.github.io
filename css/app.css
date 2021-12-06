@@ -3,6 +3,10 @@
   height: 100vh;
 }
 
+html {
+    -webkit-user-select: none;
+}
+
 /* Left Panel right border when it is visible by breakpoint */
 .panel-left.panel-in-breakpoint:before {
   position: absolute;
@@ -163,7 +167,7 @@
 }
 
 .smaller {
-    font-size: 14px;
+    font-size: 11px;
 }
 
 .hidden {
@@ -234,7 +238,6 @@ img.demo-lazy {
 
         a {
             text-decoration: none;
-            font-weight: 600;
             color: #000;
         }
 
@@ -303,7 +306,16 @@ img.demo-lazy {
             background-color: white;
             bottom: -2%;
         }
-        
+
+        #animatieInt {
+            z-index: 1;
+            position: fixed;
+            left: 0%;
+            right: 0;
+            width: 100%;
+            background-color: white;
+            bottom: -2%;
+        }        
         
         
         
@@ -369,9 +381,29 @@ img.demo-lazy {
     text-transform: revert;
 }
 
+.underline {
+    text-decoration: underline;
+}
+
+.nobold {
+    font-weight: 200 !important;
+}
+
+.delColor {
+    background-color: #A0A0F0;
+}
+
+.line_hr_text {
+    margin-left:0px !important;
+    margin-right:0px !important;
+    margin-top:0px !important;
+    margin-bottom:0px !important;
+    border-bottom-width: 1px;border-bottom-style: solid;
+}
 
 .card {
     border-radius: 16px !important;
-    box-shadow: 0px 0px 11px 3px rgba(0, 0, 0, 0.16);
-    margin-right: 32px !important;
+    box-shadow: 0px 0px 7px 3px rgba(0, 0, 0, 0.16);
+    margin-right: 7px !important;
+    margin-left: 7px !important;
 }
