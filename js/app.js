@@ -121,6 +121,26 @@ function openPanel(){
 }
 
 
+var qrModus='old';
+$('select[name="scanMode"]').on('change', function(){    
+    qrModus=$(this).val();
+
+    localforage.setItem('app_qrModus', qrModus, function(err, result) {
+        if(err) {
+            console.log('Error localforage.setItem ' + err.message);
+            localforage.clear().then(function() {
+                // Run this code once the database has been entirely deleted.
+                console.log('LocalStorage is now empty.');
+            }).catch(function(err) {
+                // This code runs if there were any errors
+                console.log('error clearing storage:');
+                console.log(err);
+            });
+        }
+    });
+
+});
+
 function localForageLoaded() {
     
     localforage.getItem('app_stored_codes', function(err,tApp_stored_codes){
@@ -135,6 +155,17 @@ function localForageLoaded() {
             showCodes();
         }
 
+    });    
+    localforage.getItem('app_qrModus', function(err,tApp_qrModus){
+        if (err) {
+            console.log('getItem(\'app_stored_codes\') error :'+ err.message);
+        } 
+        else {
+            if(tApp_qrModus) {
+                qrModus=tApp_qrModus;
+                $("#scanMode").value(qrModus);
+            }
+        }
     });    
 }
 
@@ -192,7 +223,7 @@ function showCodes(){
             optionsarray.push({
                 label: app_stored_codes[keys[0]][j],
                 value: app_stored_codes[keys[1]][j],
-                arrIdx: j,
+                arrIdx: j+1,
             })
         }
     }
@@ -221,11 +252,11 @@ function showCodes(){
     }
     optionsarray.sort(compare);
     //console.log(optionsarray);
-    var tHtml='<div class="block-title">Op je telefoon opgeslagen codes</div><div class="list links-list"><ul>';
+    var tHtml='<div class="list links-list small-margin"><ul>';
     optionsarray.forEach(function(aOption,aIdx){
         //console.log(aOption);
         if(aOption.arrIdx) {
-            tHtml+='<li class="row no-gap"><div class="col-20"><a href="javascript:delQr('+(aOption.arrIdx)+');" class="button button-fill delColor button-round" data-login-screen="#my-qr-screen">DEL</a></div><div class="col-80"><a class="link" href="javascript:showQr(\''+encodeURIComponent(aOption.value)+'\',\''+aOption.label+'\');"><span id="">'+(aIdx+1)+'. <b>'+aOption.label+'</b></span></a></div></li>';
+            tHtml+='<li class="row no-gap"><div class="col-20"><a href="javascript:delQr('+(aOption.arrIdx-1)+');" class="button button-fill delColor button-round" data-login-screen="#my-qr-screen">DEL</a></div><div class="col-80"><a class="link" href="javascript:showQr(\''+encodeURIComponent(aOption.value)+'\',\''+aOption.label+'\');"><span id="">'+(aIdx+1)+'. <b>'+aOption.label+'</b></span></a></div></li>';
         }
         else {
             //Demo codes cannot be deleted
@@ -705,17 +736,10 @@ function appRequestReady() {
     console.log('appRequestReady');
 
 
-    //We must init here, because autologin is called in this, which needs request
     initLocalForage();
-    //Add all methods you need when you need to load JSON
 
     //Load klokkenluiders-page
     app.loginScreen.open('#my-klokkenluiders-screen',false);
-
-
-    document.addEventListener('touchstart', handleTouchStartInt, false);   
-    document.addEventListener('touchmove', handleTouchMoveInt, false);
-
 
     try{
         readfromwww('application/json', 'data.json?t='+time,
@@ -733,6 +757,10 @@ function appRequestReady() {
 
     setup();
 
+    let permissions = cordova.plugins.permissions;
+    permissions.checkPermission(permissions.READ_EXTERNAL_STORAGE, checkPermissionCallback, null);
+
+
 
     if(document.getElementById("remove_add")) {
         if (document.getElementById("remove_add").nextElementSibling != null) {
@@ -742,6 +770,10 @@ function appRequestReady() {
             }
         }
     }
+    
+    document.addEventListener('touchstart', handleTouchStartInt, false);   
+    document.addEventListener('touchmove', handleTouchMoveInt, false);
+    
 }
 
 
@@ -814,6 +846,8 @@ function decodeQrHC(aString){
 }
 
 async function processQr(aQrTxt) {
+    window.qrScanner.stop();
+
     var deviceId;
     
     var data={};
@@ -889,65 +923,189 @@ async function processQr(aQrTxt) {
 
 
 
-function scanQr(){
+
+var canWrite=false;
+// Checking for permissions
+function checkPermissionCallback(status) {
+    //app.dialog.alert('Testing','Schrijfrechten.: ' + JSON.stringify(status));
+    console.log('checking permissions');
+    console.log(status);
+    if (!status.hasPermission) {
+        app.dialog.alert('Om te kunnen exporteren naar de /download map zijn er schrijfrechten nodig.','Geef aub schrijfrechten.',function(){
+            let permissions = cordova.plugins.permissions;
+            var errorCallback = function() {
+                console.log('Storage permission is not turned on');
+                app.dialog.alert('Aanvraag mislukt.','Geef aub schrijfrechten.');
+            }
+            // Asking permission to the user
+            permissions.requestPermission(
+                permissions.READ_EXTERNAL_STORAGE,
+                function(status) {
+                    if (!status.hasPermission) {
+                    errorCallback()
+                } 
+                else {
+                   // proceed with downloading
+                   canWrite=true;
+                }
+             },
+             errorCallback)
+        });
+    } 
+    else {
+        canWrite=true;
+        //app.dialog.alert('OK!','Schrijfrechten.');
+    }
+}
+
+
+
+function downloadObjectAsJson(exportObj, exportName) {
     if(app_browser) {
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+        var downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", exportName + ".json");
+        downloadAnchorNode.setAttribute("id", "downloadJson");
+        downloadAnchorNode.setAttribute("class", "external");
+        $("#app").append(downloadAnchorNode);
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        //downloadAnchorNode.click();
+        $("#downloadJson").click();
+        downloadAnchorNode.remove();
+    }
+    else {
+        try{
+            var storageLocation = "";
+
+            switch (device.platform) {
+            case "Android":
+                if(canWrite) {
+                    storageLocation = cordova.file.externalRootDirectory + 'download/';
+                }
+                else {
+                    storageLocation = cordova.file.externalDataDirectory;
+                }
+                break;
+
+            case "iOS":
+                storageLocation = cordova.file.documentsDirectory;
+                break;
+            }
+            var folderPath = storageLocation;
+            var data=JSON.stringify(exportObj);
+            var blob = new Blob([data], {
+                type: 'data:text/json;charset=utf-8'
+            });
+            
+            var filename=exportName + ".json";
+
+            window.resolveLocalFileSystemURL(
+                folderPath,
+                function(dir) {
+                    dir.getFile(
+                        filename,
+                        {
+                          create: true
+                        },
+                        function(file) {
+                            // The file...
+                            file.createWriter(
+                                function (fileWriter) {
+                                    fileWriter.write(blob);
+                                    fileWriter.onwriteend = function () {
+                                        app.dialog.alert('Bestand opgeslagen in: ' +folderPath+'/'+filename,'Exporteren gelukt');
+                                    };
+                                    fileWriter.onerror = function (err) {
+                                        app.dialog.alert('Zorg dat het bestand ' + filename + ' niet al bestaat. ' + JSON.stringify(err),'Exporteren mislukt');
+                                        console.error(err);
+                                    };
+                                }
+                            );
+                        },
+                        function(err) {
+                            app.dialog.alert('Zorg dat het bestand ' + filename + ' niet al bestaat. ' + JSON.stringify(err),'Bestand aanmaken mislukt.');
+                            console.error(err);
+                        }
+                    );
+                },
+                function(err) {
+                    app.dialog.alert('resolveLocalFileSystemURL: ' + JSON.stringify(err),'Exporteren mislukt');
+                    console.error(err);
+                }
+            );            
+        }
+        catch(err) {
+            app.dialog.alert(JSON.stringify(err),'Exporteren mislukt');
+        }
+
+
+        
+    }
+    
+}
+
+
+function exportQr(){
+    downloadObjectAsJson(app_stored_codes, 'data');
+}
+
+function scanQr(){
+    if( qrModus=='new' || app_browser ) {
         //We are on browser. Show QR Stream
         app.loginScreen.open('#my-qr-screen',false);
+        closepanel();
         $("#reader").addClass('hidden');
         
-        // This method will trigger user permissions
-        Html5Qrcode.getCameras().then(devices => {
-          /**
-           * devices would be an array of objects of type:
-           * { id: "id", label: "label" }
-           */
-          if (devices && devices.length) {
-            //alert(JSON.stringify(devices));
+
+        window.cameras=window.qrModule.listCameras(true);         
+        //Make sure we ask for camera permissions when starting
+        window.cameras.then((value) => {
             var cameraId = -1;
-            devices.forEach(function(aDevice,aIdx){
+            value.forEach(function(aDevice,aIdx){
                 console.log(aDevice);
+                //alert(JSON.stringify(aDevice));
                 if(aDevice.label !='') {
+                    //alert(aDevice.id + ' -> ' + aDevice.label);
                     if(aDevice.label.toLowerCase().includes('back') || aDevice.label.toLowerCase().includes('achter' ) ) {
                         cameraId=aDevice.id;
-                        //alert(aDevice.label);
                     }
                 }
+                if(cameraId==-1) {
+                    cameraId = value[value.length-1].id;
+                }
             });
-            if(cameraId==-1) {
-                cameraId = devices[0].id;
-                //alert(devices[0].label);
-            }
-            console.log(devices);
-            // .. use this to start scanning.
-
+            //alert('setting to ' + cameraId);
             const html5QrCode = new Html5Qrcode(/* element id */ "reader");
             html5QrCode.start(
               cameraId, 
               {
-                fps: 10,    // Optional, frame per seconds for qr code scanning
-                qrbox: { width: "100%", height: "100%" }  // Optional, if you want bounded box UI
+                fps: 20,    // Optional, frame per seconds for qr code scanning
+                qrbox: { width: 250, height: 250 }  // Optional, if you want bounded box UI
               },
               (decodedText, decodedResult) => {
                 // do something when code is read
-                onScanSuccess(decodedText,decodedResult,html5QrCode)
+                onScanSuccess(decodedText,decodedResult,html5QrCode);
               },
               (errorMessage) => {
                 // parse error, ignore it.
+                //app.dialog.alert('Geef aub toestemming om de camera te gebruiken: ' + JSON.stringify(errorMessage),'QR Error');
               })
             .catch((err) => {
               // Start failed, handle it.
+                app.dialog.alert('Geef aub toestemming om de camera te gebruiken: ' + JSON.stringify(err),'QR Error');
             });
-            $("#reader").removeClass('hidden');
+            $("#reader").removeClass('hidden');                
+        });
+        
 
-            
-          }
-        }).catch(err => {
-          // handle err
-        });    
-
+        //alert('start render');
         html5QrcodeScanner.render(onScanSuccess);
     }
-    else {
+    else { 
+        // Be sure to make any opaque HTML elements transparent here to avoid
+        // covering the video.
+        
         //Use native app QR scanning
         // app.loginScreen.open('#my-qr-screen',false);
         cordova.plugins.barcodeScanner.scan(
@@ -974,7 +1132,6 @@ function scanQr(){
                   disableSuccessBeep: true // iOS and Android
               }
         );        
-        
     }
 }
 
@@ -1612,6 +1769,11 @@ document.addEventListener("deviceready", function() {
     //Keep screen awake
     window.plugins.insomnia.keepAwake();
 
+    if(app_browser) {
+        $("#setupScanMode").addClass('hidden');
+    }
+
+
     try{
 
         readfromwww('application/json', 'skatefiets2.json',
@@ -1834,36 +1996,45 @@ async function decryptQr(aMessage) {
 
 async function saveQrFile(aTxt) {
     try {
-        var decoded=await decryptQr(aTxt);
-        var CodeToImport = JSON.parse(decoded);
+        var CodeToImport;
+        try {
+            CodeToImport = JSON.parse(aTxt);
+        } 
+        catch (e) {
+            //This is a .QR file
+            var decoded=await decryptQr(aTxt);
+            CodeToImport = JSON.parse(decoded);
+        }
+
         console.log(CodeToImport);
         if(!CodeToImport.label) {
-            app.dialog.alert('Code niet toegevoegd','Dit is een ongeldig QR bestand.');
+            app.dialog.alert('Code niet toegevoegd','Dit is een ongeldig data bestand.');
             return;
         }
 
-        if(!CodeToImport.label[0]) {
-            app.dialog.alert('Code niet toegevoegd','Dit is een ongeldig QR bestand.');
-            return;
-        }
 
         if(!CodeToImport.value) {
-            app.dialog.alert('Code niet toegevoegd','Dit is een ongeldig QR bestand.');
+            app.dialog.alert('Code niet toegevoegd','Dit is een ongeldig data bestand.');
             return;
         }
 
-        if(!CodeToImport.value[0]) {
-            app.dialog.alert('Code niet toegevoegd','Dit is een ongeldig QR bestand.');
-            return;
-        }
         
         //Valid .qr file Add it to local storage
 
         //Store this code and refresh
         var lastCode=Object.keys(app_stored_codes.label).length;
         
-        app_stored_codes.value[lastCode]=CodeToImport.value[0];
-        app_stored_codes.label[lastCode]=CodeToImport.label[0];
+        let keysV = Object.keys(CodeToImport);
+        var totalCodes=Object.keys(CodeToImport[keysV[0]]).length;
+        
+        for(var i=0;i<totalCodes;i++) {
+            if(CodeToImport.label[i]!='') {
+                app_stored_codes.value[lastCode]=CodeToImport.value[i];
+                app_stored_codes.label[lastCode]=CodeToImport.label[i];
+                lastCode++;
+            }
+        }
+        
         //Save to local forage
 
         localforage.setItem('app_stored_codes', app_stored_codes, function(err, result) {
@@ -1930,7 +2101,7 @@ async function importQr(){
             const file = await chooser.getFile();
             if(file) {
                 if (file.name !='canceled') {
-                    if(file.name.toLowerCase().endsWith('.qr') ) {
+                    if(file.name.toLowerCase().endsWith('.qr') || file.name.toLowerCase().endsWith('.json') ) {
                         var contents=Utf8ArrayToStr(file.data);
                         try {
                             var CodeToImport=contents;
@@ -2032,6 +2203,10 @@ window.addEventListener('resize', () => {
     $("#slide_title_1").css("margin-right","0px");
     $("#slide_title_2").css("margin-right","0px");
 })
+
+
+
+
 
 
 async function awaitWasm(){
