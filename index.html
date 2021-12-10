@@ -27,7 +27,7 @@
   
   <link rel="stylesheet" href="framework7/framework7-bundle.min.css">
   <link rel="stylesheet" href="css/icons.css">
-  <link rel="stylesheet" href="css/app.css?t=80">
+  <link rel="stylesheet" href="css/app.css?t=78">
 </head>
 <body id="body">
   <div id="app" class="font_araboto larger" >
@@ -274,32 +274,25 @@
                         </p>
                         
                         <div id="debug"></div>
-                        <div class="list" id="setupScanMode">
+                        <div class="list hidden" id="setupScanMode">
                             <ul>
                                 <li>
-                                <div class="row">
-                                    <div class="col-15">
-                                        <img data-src="img/camera_mode.png" src="img/camera_mode.png" height="64" class="lazy lazy-fade-in demo-lazy" />
-                                    </div>
-                                    <div class="col-85">
-                                        <a id="setupScanModeClick" class="item-link smart-select smart-select-init" data-open-in="popover">
-                                            <select id="scanMode" name="scanMode" value="old">
-                                                <option value="old" selected>Oud</option>
-                                                <option value="new">Nieuw</option>
-                                            </select>
-                                            <div class="item-content">
-                                                <div class="item-inner">
-                                                    <div class="item-title bigger font_araboto_bold ">Qrscan Modus</div>
-                                                </div>
+                                    <a class="item-link smart-select smart-select-init" data-open-in="popover">
+                                        <select name="scanMode" value="Nieuw">
+                                            <option value="new" selected>Nieuw</option>
+                                            <option value="old">Oud</option>
+                                        </select>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title bigger font_araboto_bold ">Qrscan Modus</div>
                                             </div>
-                                        </a>
-                                    </div>
-                                </div>
+                                        </div>
+                                    </a>
                                 </li>                                
                             </ul>
                         </div>
                         
-                        <div class="block-title small-margin">Op je telefoon opgeslagen papieren codes</div>
+                        <div class="block-title small-margin">Op je telefoon opgeslagen codes</div>
                         <div id="data_list" class="scrollable">
                         </div>
                     </div>
@@ -316,7 +309,7 @@
                 <div class="header">
                     <div class="arrow" onclick="javascript:closeScreens(true);" style="cursor:pointer; height: 24px;"></div>
                     <div class="title sliding font_araboto_bold link_black" onclick="javascript:closeScreens();">Nederlandse QR</div>
-                    <div class="link_blue font_araboto font_16"><a href="#" data-popup=".my-popup" class="popup-open">Details</a></div>
+                    <div class="link_blue font_araboto smaller"><a href="#" data-popup=".my-popup" class="popup-open">Details</a></div>
                 </div>
                   </div>
                   <!-- And somewhere in DOM -->
@@ -476,7 +469,7 @@
                 <div class="header">
                     <div class="arrow" onclick="javascript:closeScreens(true);" style="cursor:pointer; height: 24px;"></div>
                     <div class="title sliding font_araboto_bold link_black" onclick="javascript:closeScreens();">Internationale QR</div>
-                    <div class="link_blue font_araboto  font_16"><a href="#" data-popup=".my-popup" class="popup-open">Details</a></div>
+                    <div class="link_blue font_araboto smaller"><a href="#" data-popup=".my-popup" class="popup-open">Details</a></div>
                 </div>
                   </div>
                   <!-- And somewhere in DOM -->
@@ -674,6 +667,7 @@
         result => processQr(result)
     );
     window.qrModule=QrScanner;
+
 </script>
 
 
