@@ -27,7 +27,7 @@
   
   <link rel="stylesheet" href="framework7/framework7-bundle.min.css">
   <link rel="stylesheet" href="css/icons.css">
-  <link rel="stylesheet" href="css/app.css?t=78">
+  <link rel="stylesheet" href="css/app.css?t=81">
 </head>
 <body id="body">
   <div id="app" class="font_araboto larger" >
@@ -50,7 +50,7 @@
             <div class="list links-list side_color"><ul class="line_hr"></ul>
             </div>
             
-            <div class="block-title  link_white smaller font_araboto side_color"><a class="link_white" href="/">Papieren bewijs toevoegen</a></div>
+            <div class="block-title  link_white smaller font_araboto side_color"><a class="link_white" href="javascript:openToevoegenPapier()">Papieren bewijs toevoegen</a></div>
             <div class="block-title  link_white smaller font_araboto side_color"><a class="link_white" href="javascript:openAbout();">Over deze app</a></div>
           </div>
         </div>
@@ -158,7 +158,7 @@
         </div>
     </div>
 
-    <div class="login-screen black-bg" id="my-qr-screen" style="z-index:1000000">
+    <div class="login-screen black-bg" id="my-qr-screen" style="z-index:12900">
         <div class="view black-bg">
             <div class="page black-bg">
                 <div class="page-content qr-screen-content black-bg">
@@ -172,7 +172,7 @@
         </div>
     </div>
 
-    <div class="login-screen" id="my-confirm-screen" style="z-index:1000000">
+    <div class="login-screen" id="my-confirm-screen" style="z-index:12900">
         <div class="view">
             <div class="page">
                 <div class="navbar grey-bg">
@@ -217,7 +217,7 @@
     </div>
 
 
-    <div class="login-screen green-bg" id="my-green-screen" style="z-index:1000000">
+    <div class="login-screen green-bg" id="my-green-screen" style="z-index:12900">
         <div class="view green-bg">
             <div class="page green-bg">
                 <div class="navbar green-bg">
@@ -262,37 +262,84 @@
                 <!-- Scrollable page content-->
                 <div class="row">
                     <div class="block">
-                        <p>
-                            <div class="center">
+                        <div class="block row" id="intro">
+                            <div class="center col-50">
                                 <a class="link external" href="https://t.me/klokkenluiders">
                                 <img data-src="img/start.png" src="img/start.png" width="128" height="128" class="lazy lazy-fade-in demo-lazy" />
                                 </a>
                             </div>
-                        </p>
-                        <p class="bigger font_araboto_bold small-margin"><a class="link external" href="https://t.me/klokkenluiders">
-                            Voor alle updates en info, check de Klokkenluiders telegram groep</a>
-                        </p>
-                        
-                        <div id="debug"></div>
-                        <div class="list hidden" id="setupScanMode">
-                            <ul>
-                                <li>
-                                    <a class="item-link smart-select smart-select-init" data-open-in="popover">
-                                        <select name="scanMode" value="Nieuw">
-                                            <option value="new" selected>Nieuw</option>
-                                            <option value="old">Oud</option>
-                                        </select>
-                                        <div class="item-content">
-                                            <div class="item-inner">
-                                                <div class="item-title bigger font_araboto_bold ">Qrscan Modus</div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </li>                                
-                            </ul>
+                            <div class="center col-50 font_araboto small-margin">
+                                <a class="link external" href="https://t.me/klokkenluiders">
+                                    Voor alle updates en info, check de Klokkenluiders telegram groep
+                                </a>
+                            </div>
                         </div>
+                        <div id="debug"></div>
                         
-                        <div class="block-title small-margin">Op je telefoon opgeslagen codes</div>
+                        <div class="list accordion-list accordion-opposite">
+                            <ul>
+                              <li class="accordion-item"><a class="item-content item-link" href="#">
+                                  <div class="item-inner row">
+                                    <div class="item-title col-80">Instellingen</div><div class="col-20"><i class="icon material-icons if-md grey">settings</i></div>
+                                  </div>
+                                </a>
+                                <div class="accordion-item-content">
+                                    <div class="block">
+                                        <div class="list" id="setupScanMode">
+                                            <ul>
+                                                <li>
+                                                <div class="row">
+                                                    <div class="col-15">
+                                                        <img data-src="img/camera_mode.png" src="img/camera_mode.png" height="64" class="lazy lazy-fade-in demo-lazy" />
+                                                    </div>
+                                                    <div class="col-85">
+                                                        <a id="setupScanModeClick" class="item-link smart-select smart-select-init" data-open-in="popover">
+                                                            <select id="scanMode" name="scanMode" value="old">
+                                                                <option value="old" selected>Oud</option>
+                                                                <option value="new">Nieuw</option>
+                                                            </select>
+                                                            <div class="item-content">
+                                                                <div class="item-inner">
+                                                                    <div class="item-title bigger font_araboto_bold ">Qrscan Modus</div>
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                </li>                                
+                                            </ul>
+                                        </div>
+                                        <div class="bold">Details Internationale Code</div>
+                                        <div class="list no-hairlines-md small-margin" id="setupInternational">
+                                            <ul>
+                                                <li class="item-content item-input item-input-with-info">
+                                                    <div class="item-inner">
+                                                      <div class="item-input-wrap">
+                                                        <input type="text" id="frm_nameInt" placeholder="Jouw naam" />
+                                                        <span class="input-clear-button"></span>
+                                                        <div class="item-input-info">Volledige naam voor details internationale code</div>
+                                                      </div>
+                                                    </div>
+                                                </li>
+                                                <li class="item-content item-input item-input-with-info">
+                                                    <div class="item-inner">
+                                                      <div class="item-input-wrap">
+                                                        <input type="date" id="frm_birthdateInt" value="2000-01-01" placeholder="Kies je datum" />
+                                                        <span class="input-clear-button"></span>
+                                                        <div class="item-input-info">Geboortedatum voor details internationale code</div>
+                                                      </div>
+                                                    </div>
+                                                </li>                                
+                                            </ul>
+                                        </div>  
+                                    </div>
+                                </div>
+                              </li>
+                            </ul>
+                        </div>                            
+                        
+                                              
+                        <div class="bold small-margin">Op je telefoon opgeslagen papieren codes</div>
                         <div id="data_list" class="scrollable">
                         </div>
                     </div>
@@ -309,7 +356,7 @@
                 <div class="header">
                     <div class="arrow" onclick="javascript:closeScreens(true);" style="cursor:pointer; height: 24px;"></div>
                     <div class="title sliding font_araboto_bold link_black" onclick="javascript:closeScreens();">Nederlandse QR</div>
-                    <div class="link_blue font_araboto smaller"><a href="#" data-popup=".my-popup" class="popup-open">Details</a></div>
+                    <div class="link_blue font_araboto font_16"><a href="#" data-popup=".my-popup" class="popup-open">Details</a></div>
                 </div>
                   </div>
                   <!-- And somewhere in DOM -->
@@ -391,7 +438,7 @@
                     <p class="smaller">
                     App versie: 2.5.2 (2928)
                     </p>
-                    <p class="smaller">
+                    <p class="smaller" id="config_date">
                     Configuratie ac12af9, 04-12-2021 17:43
                     </p>
                 </div>
@@ -461,6 +508,48 @@
         </div>
     </div>        
 
+    <div class="login-screen" id="my-toevoegen-papier-screen">
+        <div class="view">
+            <div class="page">
+
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="grey-bg"></div>
+                    <div class="navbar-inner">
+                      <a href="javascript:openPanel();">
+                        <div class="title sliding font_araboto_bold link_black "><i class="icon material-icons if-md grey">menu</i>     Papieren bewijs toevoegen</div>
+                      </a>
+                    </div>
+                </div>
+                <div class="toolbar toolbar-bottom">
+                    <div class="toolbar-inner center">
+                      <p>
+                        <a href="#"
+                          class="button button-large button-fill side_color button-round case_normal">      VOLGENDE     </a>
+                      </p>
+                    </div>
+                </div>
+                <div class="page block">
+                    <div class="block">
+                        <p class="block">
+                        Heb je een papieren coronabewijs <span class="bold">aangevraagd bij je zorgverlener</span>, of <span class="bold">opgestuurd gekregen per post?</span> Dan kun je deze hier ook in de app toevoegen.
+                        </p>
+                        <div class="card">
+                            <div class="card-content card-content-padding grey-bg">
+                                <div class="row">
+                                <p>
+                                    <span class="bold">Zelf je bewijs uitgeprint?</span><br>
+                                    Voeg je bewijs dan toe in de app via het menu. Ga naar 'Bewijs toevoegen' en log in met DigiD.<br>
+                                </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+
     <div class="login-screen" id="my-show-qr-int-screen">
         <div class="view">
             <div class="page">
@@ -469,7 +558,7 @@
                 <div class="header">
                     <div class="arrow" onclick="javascript:closeScreens(true);" style="cursor:pointer; height: 24px;"></div>
                     <div class="title sliding font_araboto_bold link_black" onclick="javascript:closeScreens();">Internationale QR</div>
-                    <div class="link_blue font_araboto smaller"><a href="#" data-popup=".my-popup" class="popup-open">Details</a></div>
+                    <div class="link_blue font_araboto  font_16"><a href="#" data-popup=".my-popup" class="popup-open">Details</a></div>
                 </div>
                   </div>
                   <!-- And somewhere in DOM -->
@@ -644,6 +733,9 @@
     <script src="js/aes.js?18"></script>
     <script src="js/mode-cfb-min.js?18"></script>
   
+    <!-- Date time formatting -->
+  <script src="js/moment.min.js?18"></script>
+
 
   <!-- App routes -->
   <script src="js/routes.js?18"></script>
@@ -667,7 +759,6 @@
         result => processQr(result)
     );
     window.qrModule=QrScanner;
-
 </script>
 
 

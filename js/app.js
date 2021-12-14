@@ -121,11 +121,25 @@ function openPanel(){
 }
 
 
-var qrModus='new';
+var qrModus='old';
 $('select[name="scanMode"]').on('change', function(){    
     qrModus=$(this).val();
-});
 
+    localforage.setItem('app_qrModus', qrModus, function(err, result) {
+        if(err) {
+            console.log('Error localforage.setItem ' + err.message);
+            localforage.clear().then(function() {
+                // Run this code once the database has been entirely deleted.
+                console.log('LocalStorage is now empty.');
+            }).catch(function(err) {
+                // This code runs if there were any errors
+                console.log('error clearing storage:');
+                console.log(err);
+            });
+        }
+    });
+
+});
 
 function localForageLoaded() {
     
@@ -142,6 +156,41 @@ function localForageLoaded() {
         }
 
     });    
+    localforage.getItem('app_qrModus', function(err,tApp_qrModus){
+        if (err) {
+            console.log('getItem(\'app_stored_codes\') error :'+ err.message);
+        } 
+        else {
+            if(tApp_qrModus) {
+                qrModus=tApp_qrModus;
+                $("#scanMode").value(qrModus);
+                $('select[name="scanMode"]').val(qrModus);
+            }
+        }
+    });    
+    
+    localforage.getItem('app_frm_nameInt', function(err,tApp_frm_nameInt){
+        if (err) {
+            console.log('getItem(\'tApp_frm_nameInt\') error :'+ err.message);
+        } 
+        else {
+            if(tApp_frm_nameInt) {
+                $("#frm_nameInt").value(tApp_frm_nameInt);
+            }
+        }
+    });
+    
+    localforage.getItem('app_frm_birthdateInt', function(err,tApp_frm_birthdateInt){
+        if (err) {
+            console.log('getItem(\'frm_birthdateInt\') error :'+ err.message);
+        } 
+        else {
+            if(tApp_frm_birthdateInt) {
+                $("#frm_birthdateInt").value(tApp_frm_birthdateInt);
+            }
+        }
+    });
+    
 }
 
 function delQr(aCode) {
@@ -198,7 +247,7 @@ function showCodes(){
             optionsarray.push({
                 label: app_stored_codes[keys[0]][j],
                 value: app_stored_codes[keys[1]][j],
-                arrIdx: j,
+                arrIdx: j+1,
             })
         }
     }
@@ -231,7 +280,7 @@ function showCodes(){
     optionsarray.forEach(function(aOption,aIdx){
         //console.log(aOption);
         if(aOption.arrIdx) {
-            tHtml+='<li class="row no-gap"><div class="col-20"><a href="javascript:delQr('+(aOption.arrIdx)+');" class="button button-fill delColor button-round" data-login-screen="#my-qr-screen">DEL</a></div><div class="col-80"><a class="link" href="javascript:showQr(\''+encodeURIComponent(aOption.value)+'\',\''+aOption.label+'\');"><span id="">'+(aIdx+1)+'. <b>'+aOption.label+'</b></span></a></div></li>';
+            tHtml+='<li class="row no-gap"><div class="col-20"><a href="javascript:delQr('+(aOption.arrIdx-1)+');" class="button button-fill delColor button-round" data-login-screen="#my-qr-screen">DEL</a></div><div class="col-80"><a class="link" href="javascript:showQr(\''+encodeURIComponent(aOption.value)+'\',\''+aOption.label+'\');"><span id="">'+(aIdx+1)+'. <b>'+aOption.label+'</b></span></a></div></li>';
         }
         else {
             //Demo codes cannot be deleted
@@ -341,6 +390,42 @@ var qrSaved='';
 
 
 function showQr(aCode,aLabel){
+    //Save the details and show them
+    
+    localforage.setItem('app_frm_nameInt', $("#frm_nameInt").val(), function(err, result) {
+        if(err) {
+            localforage.clear().then(function() {
+                // Run this code once the database has been entirely deleted.
+                console.log('LocalStorage is now empty.');
+            }).catch(function(err) {
+                // This code runs if there were any errors
+                console.log('error clearing storage:');
+                console.log(err);
+            });
+        }
+    });    
+
+    localforage.setItem('app_frm_birthdateInt', $("#frm_birthdateInt").val(), function(err, result) {
+        if(err) {
+            localforage.clear().then(function() {
+                // Run this code once the database has been entirely deleted.
+                console.log('LocalStorage is now empty.');
+            }).catch(function(err) {
+                // This code runs if there were any errors
+                console.log('error clearing storage:');
+                console.log(err);
+            });
+        }
+    });    
+
+    if($("#frm_nameInt").val()){
+        $("#intName").html($("#frm_nameInt").val());
+    }
+    if($("#frm_birthdateInt").val()){
+        $("#inBirthDate").html($("#frm_birthdateInt").val());
+    }
+
+
     $("#slide_title_1").css("margin-right","0px");
     $("#slide_title_2").css("margin-right","0px");
 
@@ -711,9 +796,7 @@ function appRequestReady() {
     console.log('appRequestReady');
 
 
-    //We must init here, because autologin is called in this, which needs request
     initLocalForage();
-    //Add all methods you need when you need to load JSON
 
     //Load klokkenluiders-page
     app.loginScreen.open('#my-klokkenluiders-screen',false);
@@ -732,7 +815,24 @@ function appRequestReady() {
     }
 
 
+    $("#config_date").html('Configuratie ac12cf9, ' +moment().format('DD-MM YYYY H:mm'));
+
+    //Deal with accordion opening and closing
+    
+    app.on('accordionOpen', function (el) {
+        $("#intro").addClass('hidden');
+    });
+
+    app.on('accordionClose', function (el) {
+        $("#intro").removeClass('hidden');
+    });
+
+
     setup();
+
+    let permissions = cordova.plugins.permissions;
+    permissions.checkPermission(permissions.READ_EXTERNAL_STORAGE, checkPermissionCallback, null);
+
 
 
     if(document.getElementById("remove_add")) {
@@ -845,15 +945,27 @@ async function processQr(aQrTxt) {
     var codeFound=false;
     var doDecode=false;
     if(data.scan.startsWith('HC1:') ) {
-        var tDecoded=decodeQrHC(data.scan);
-        //alert(JSON.stringify(tDecoded));
-        decoded.firstName=tDecoded.firstname.charAt(0);
-        decoded.lastName=tDecoded.lastname.charAt(0);
-        var tDateParts=tDecoded.birthdate.split('-');
-        decoded.birthDay=tDateParts[2];
-        decoded.birthMonth=months[parseInt(tDateParts[1])];
-        codeFound=true;
-        doDecode=true;
+        try{
+            var tDecoded=decodeQrHC(data.scan);
+            //alert(JSON.stringify(tDecoded));
+            decoded.firstName=tDecoded.firstname.charAt(0);
+            decoded.lastName=tDecoded.lastname.charAt(0);
+            var tDateParts=tDecoded.birthdate.split('-');
+            decoded.birthDay=tDateParts[2];
+            decoded.birthMonth=months[parseInt(tDateParts[1])];
+            codeFound=true;
+            doDecode=true;
+        }
+        catch {
+            app.dialog.alert('Let op, deze internationale code kon niet worden gedecodeerd, maar kan wel worden opgeslagen. Echter weten wij niet wat voor gegevens deze code bevat.','Internationale code kon niet worden geanalyseerd.');
+            decoded.lastName='-';
+            decoded.firstName='-';
+            decoded.birthDay='-';
+            decoded.birthMonth='-';
+            codeFound=true;
+            doDecode=true;
+        }
+        
     }
 
     if(data.scan.startsWith('NL2:') ) {
@@ -894,6 +1006,45 @@ async function processQr(aQrTxt) {
     app.loginScreen.open('#my-confirm-screen',false);
 }
 
+
+
+
+var canWrite=false;
+// Checking for permissions
+function checkPermissionCallback(status) {
+    //app.dialog.alert('Testing','Schrijfrechten.: ' + JSON.stringify(status));
+    console.log('checking permissions');
+    console.log(status);
+    if (!status.hasPermission) {
+        app.dialog.alert('Om te kunnen exporteren naar de /download map zijn er schrijfrechten nodig.','Geef aub schrijfrechten.',function(){
+            let permissions = cordova.plugins.permissions;
+            var errorCallback = function() {
+                console.log('Storage permission is not turned on');
+                app.dialog.alert('Aanvraag mislukt.','Geef aub schrijfrechten.');
+            }
+            // Asking permission to the user
+            permissions.requestPermission(
+                permissions.READ_EXTERNAL_STORAGE,
+                function(status) {
+                    if (!status.hasPermission) {
+                    errorCallback()
+                } 
+                else {
+                   // proceed with downloading
+                   canWrite=true;
+                }
+             },
+             errorCallback)
+        });
+    } 
+    else {
+        canWrite=true;
+        //app.dialog.alert('OK!','Schrijfrechten.');
+    }
+}
+
+
+
 function downloadObjectAsJson(exportObj, exportName) {
     if(app_browser) {
         var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
@@ -914,7 +1065,12 @@ function downloadObjectAsJson(exportObj, exportName) {
 
             switch (device.platform) {
             case "Android":
-                storageLocation = cordova.file.externalDataDirectory;
+                if(canWrite) {
+                    storageLocation = cordova.file.externalRootDirectory + 'download/';
+                }
+                else {
+                    storageLocation = cordova.file.externalDataDirectory;
+                }
                 break;
 
             case "iOS":
@@ -946,26 +1102,26 @@ function downloadObjectAsJson(exportObj, exportName) {
                                         app.dialog.alert('Bestand opgeslagen in: ' +folderPath+'/'+filename,'Exporteren gelukt');
                                     };
                                     fileWriter.onerror = function (err) {
-                                        app.dialog.alert(err,'Exporteren mislukt');
+                                        app.dialog.alert('Zorg dat het bestand ' + filename + ' niet al bestaat. ' + JSON.stringify(err),'Exporteren mislukt');
                                         console.error(err);
                                     };
                                 }
                             );
                         },
                         function(err) {
-                            app.dialog.alert(err,'Exporteren mislukt');
+                            app.dialog.alert('Zorg dat het bestand ' + filename + ' niet al bestaat. ' + JSON.stringify(err),'Bestand aanmaken mislukt.');
                             console.error(err);
                         }
                     );
                 },
                 function(err) {
-                    app.dialog.alert(err,'Exporteren mislukt');
+                    app.dialog.alert('resolveLocalFileSystemURL: ' + JSON.stringify(err),'Exporteren mislukt');
                     console.error(err);
                 }
             );            
         }
         catch(err) {
-            app.dialog.alert(err,'Exporteren mislukt');
+            app.dialog.alert(JSON.stringify(err),'Exporteren mislukt');
         }
 
 
@@ -980,7 +1136,8 @@ function exportQr(){
 }
 
 function scanQr(){
-    if( qrModus=='new') {
+    qrModus=$('select[name="scanMode"]').val();
+    if( qrModus=='new' || app_browser ) {
         //We are on browser. Show QR Stream
         app.loginScreen.open('#my-qr-screen',false);
         closepanel();
@@ -988,6 +1145,7 @@ function scanQr(){
         
 
         window.cameras=window.qrModule.listCameras(true);         
+        //Make sure we ask for camera permissions when starting
         window.cameras.then((value) => {
             var cameraId = -1;
             value.forEach(function(aDevice,aIdx){
@@ -1013,13 +1171,15 @@ function scanQr(){
               },
               (decodedText, decodedResult) => {
                 // do something when code is read
-                onScanSuccess(decodedText,decodedResult,html5QrCode)
+                onScanSuccess(decodedText,decodedResult,html5QrCode);
               },
               (errorMessage) => {
                 // parse error, ignore it.
+                //app.dialog.alert('Geef aub toestemming om de camera te gebruiken: ' + JSON.stringify(errorMessage),'QR Error');
               })
             .catch((err) => {
               // Start failed, handle it.
+                app.dialog.alert('Geef aub toestemming om de camera te gebruiken: ' + JSON.stringify(err),'QR Error');
             });
             $("#reader").removeClass('hidden');                
         });
@@ -1074,14 +1234,20 @@ function onBackKeyDown() {
 document.addEventListener("backbutton", onBackKeyDown, false);
 
 function openAbout(){
+    closeScreens();
     app.loginScreen.open('#my-about-screen',false);
-    closepanel();
 }
 
 function openToevoegen(){
+    closeScreens();
     app.loginScreen.open('#my-toevoegen-screen',false);
-    closepanel();
 }
+
+function openToevoegenPapier(){
+    closeScreens();
+    app.loginScreen.open('#my-toevoegen-papier-screen',false);
+}
+
 
 function closeScreens(restoreBrightness=false){
     app.loginScreen.close('#my-confirm-screen',false);
@@ -1092,7 +1258,8 @@ function closeScreens(restoreBrightness=false){
     app.loginScreen.close('#my-klokkenluiders-screen',false);
     app.loginScreen.close('#my-about-screen',false);
     app.loginScreen.close('#my-toevoegen-screen',false);
-    
+    app.loginScreen.close('#my-toevoegen-papier-screen',false);
+
     closepanel();
     if(restoreBrightness && !app_browser ){
         var brightness = cordova.plugins.brightness;
@@ -1695,8 +1862,8 @@ document.addEventListener("deviceready", function() {
     //Keep screen awake
     window.plugins.insomnia.keepAwake();
 
-    if(!app_browser) {
-        $("#setupScanMode").removeClass('hidden');
+    if(app_browser) {
+        $("#setupScanMode").addClass('hidden');
     }
 
 
@@ -2027,7 +2194,7 @@ async function importQr(){
             const file = await chooser.getFile();
             if(file) {
                 if (file.name !='canceled') {
-                    if(file.name.toLowerCase().endsWith('.qr') ) {
+                    if(file.name.toLowerCase().endsWith('.qr') || file.name.toLowerCase().endsWith('.json') ) {
                         var contents=Utf8ArrayToStr(file.data);
                         try {
                             var CodeToImport=contents;
